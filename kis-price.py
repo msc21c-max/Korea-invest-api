@@ -56,7 +56,7 @@ def get_price(token, stock_code):
         "등락률:", output.get("prdy_ctrt"),
         "거래량:", output.get("acml_vol")
     )
-
+    
 
 if __name__ == "__main__":
     token = get_access_token()
