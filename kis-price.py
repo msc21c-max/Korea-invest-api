@@ -4,8 +4,8 @@ import requests
 BASE_URL = "https://openapi.koreainvestment.com:9443"
 
 # 아래 두 곳은 나중에 본인의 키로 입력합니다.
-APP_KEY = "여기에_APP_KEY"
-APP_SECRET = "여기에_APP_SECRET"
+APP_KEY = "PSOvDKEdweyPRn2G5b7JJ1GZnICKZDa0TJtc"
+APP_SECRET = ""
 
 
 def get_access_token():
