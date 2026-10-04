@@ -4,8 +4,8 @@ import requests
 BASE_URL = "https://openapi.koreainvestment.com:9443"
 
 # 아래 두 곳은 나중에 본인의 키로 입력합니다.
-APP_KEY = "PSOvDKEdweyPRn2G5b7JJ1GZnICKZDa0TJtc"
-APP_SECRET = ""
+APP_KEY = "PSMWL1TLxYcAECT8YR1UYXt4d6ThjIpIpsU6"
+APP_SECRET = "Q8vqn4NgFm82zuEsazwhvoiKhYhXpnbjBAj1szsie9Q/buVIqd4iQBGLHlJMp+AvWJ6uRirv4u4p3K9x8saCIyuGnm22TWzc9rpyXN7He41pccpvFTt5V+NI/G9BE+pDFtfQe8YIQKwwV2j7ZqfGJGrHhRpcfRomrMUKsUe9q3dFYAcZTLA="
 
 
 def get_access_token():
