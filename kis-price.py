@@ -1,5 +1,5 @@
 import requests
-
+import os
 # 한국투자증권 Open API
 BASE_URL = "https://openapi.koreainvestment.com:9443"
 
