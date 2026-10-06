@@ -1,15 +1,21 @@
 import os
 import requests
+from flask import Flask, jsonify
 
-APP_KEY = os.environ["APP_KEY"]
-APP_SECRET = os.environ["APP_SECRET"]
+app = Flask(__name__)
+
+APP_KEY = os.environ.get("APP_KEY")
+APP_SECRET = os.environ.get("APP_SECRET")
 
 BASE_URL = "https://openapi.koreainvestment.com:9443"
 
 
-# 1. 토큰은 한 번만 발급
 def get_access_token():
     url = f"{BASE_URL}/oauth2/tokenP"
+
+    headers = {
+        "content-type": "application/json"
+    }
 
     body = {
         "grant_type": "client_credentials",
@@ -17,48 +23,60 @@ def get_access_token():
         "appsecret": APP_SECRET
     }
 
-    res = requests.post(url, json=body)
-    res.raise_for_status()
+    response = requests.post(url, headers=headers, json=body, timeout=10)
+    response.raise_for_status()
 
-    return res.json()["access_token"]
-
-
-# 2. 발급받은 토큰으로 여러 종목 조회
-def get_stock_price(stock_code, access_token):
-    url = f"{BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-price"
-
-    headers = {
-        "Content-Type": "application/json; charset=utf-8",
-        "authorization": f"Bearer {access_token}",
-        "appkey": APP_KEY,
-        "appsecret": APP_SECRET,
-        "tr_id": "FHKST01010100"
-    }
-
-    params = {
-        "FID_COND_MRKT_DIV_CODE": "J",
-        "FID_INPUT_ISCD": stock_code
-    }
-
-    res = requests.get(url, headers=headers, params=params)
-    res.raise_for_status()
-
-    return res.json()
+    return response.json()["access_token"]
 
 
-# 3. 여기서 딱 한 번 토큰 발급
-access_token = get_access_token()
+@app.route("/")
+def home():
+    return jsonify({
+        "service": "Korea Investment API",
+        "status": "OK",
+        "usage": "/price/005930"
+    })
 
 
-# 4. 여러 종목은 같은 토큰 사용
-stock_codes = [
-    "005930",  # 삼성전자
-]
-
-for code in stock_codes:
+@app.route("/price/<code>")
+def get_price(code):
     try:
-        result = get_stock_price(code, access_token)
-        print(code, result)
+        token = get_access_token()
+
+        url = f"{BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-price"
+
+        headers = {
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": APP_KEY,
+            "appsecret": APP_SECRET,
+            "tr_id": "FHKST01010100"
+        }
+
+        params = {
+            "FID_COND_MRKT_DIV_CODE": "J",
+            "FID_INPUT_ISCD": code
+        }
+
+        response = requests.get(
+            url,
+            headers=headers,
+            params=params,
+            timeout=10
+        )
+
+        response.raise_for_status()
+        data = response.json()
+
+        return jsonify(data)
 
     except Exception as e:
-        print(code, "조회 오류:", e)
+        return jsonify({
+            "status": "ERROR",
+            "message": str(e)
+        }), 500
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
